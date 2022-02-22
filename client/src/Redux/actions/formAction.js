@@ -1,5 +1,5 @@
 import axios from 'axios';
-const API_URL = "http://localhost:5000/api/form/";
+const API_URL = "https://mgoogleform.herokuapp.com/api/form/";
 
 export default {
     getForms(userId) {
