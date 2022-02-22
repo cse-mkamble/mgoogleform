@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { Grid, Paper, Typography, CircularProgress, FormControlLabel, Radio, AppBar, Toolbar, Button, IconButton, RadioGroup, Divider, Container } from '@mui/material';
+import { Grid, Paper, Typography, CircularProgress, FormControlLabel, Radio, AppBar, Toolbar, Button, IconButton, RadioGroup, Divider, Container, TextField } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 
 import { isAuthenticated } from '../../Redux/actions/authAction';
@@ -11,32 +11,55 @@ function UserView(props) {
   const [userId, setUserId] = React.useState("")
   const [formData, setFormData] = React.useState({});
   const [responseData, setResponseData] = React.useState([])
+  const [sOpData, setSOpData] = React.useState([])
   //console.log(responseData);
 
   const [optionValue, setOptionValue] = React.useState([])
   const [isSubmitted, setIsSubmitted] = React.useState(false)
 
 
+  const initialState = { name: '', email: '', };
+  const [userData, setUserData] = useState(initialState);
+  const { name, email } = userData;
+
+
+  const handleChangeInput = e => {
+    const { name, value } = e.target;
+    setUserData({ ...userData, [name]: value });
+  }
+
   const [questions, setQuestions] = React.useState([]);
   const [value, setValue] = React.useState('');
+  // const [optionValue, setOptionValue] = React.useState({});
   //console.log(value);
   React.useEffect(() => {
-    if (isAuthenticated()) {
-      var userr = auth.user;
-      console.log(userr._id);
-      setUserId(userr._id);
-    } else {
-      var anonymousUserId = "anonymous" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-      console.log(anonymousUserId);
-      setUserId(anonymousUserId)
-    }
+    // if (isAuthenticated()) {
+    //   console.log(auth.user);
+
+    //   var userr = auth.user;
+    //   console.log(userr.id);
+    //   setUserId(auth.user._id);
+    // } else {
+    var anonymousUserId = "anonymous" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    console.log(anonymousUserId);
+    setUserId(anonymousUserId)
+    // }
   }, [])
 
 
+  //
+  const handleChangeInputofRadio = e => {
+    const { name, value } = e.target
+    setUserData({ ...userData, [name]: value })
+  }
 
   const handleRadioChange = (j, i) => {
     var questionId = questions[i]._id
     var optionId = questions[i].options[j]._id
+
+    console.log(j);
+    var iStr = String(i);
+    var valueOfJ = j.toString();
 
     var fakeData = {
       question: i,
@@ -45,26 +68,38 @@ function UserView(props) {
     var data = {
       questionId, optionId
     }
-    //  console.log(data);
+    var rSOpdata = { que: iStr, op: valueOfJ }
+    console.log(data);
+    console.log(rSOpdata);
     //console.log(fakeData);
     // console.log(j);
 
     setValue(j)
 
     var fakeRData = [...responseData];
+    var fakeRSOsData = [...sOpData];
 
     var indexOfResponse = fakeRData.findIndex(x => x.questionId === questionId);
+
+    var indexOffakeRSOsData = fakeRSOsData.findIndex(x => x.que === iStr);
+
     if (indexOfResponse === -1) {
       setResponseData(responseData => [...responseData, data])
-
     } else {
       fakeRData[indexOfResponse].questionId = questionId
       setResponseData(fakeRData);
     }
 
+    if (indexOfResponse === -1) {
+      setSOpData(sOpData => [...sOpData, rSOpdata])
+    } else {
+      fakeRSOsData[indexOffakeRSOsData].que = iStr
+      setSOpData(fakeRSOsData);
+    }
 
-    // setOptionValue(fakeData);
-    //  
+    console.log(responseData)
+    console.log(sOpData)
+
   };
 
   React.useEffect(() => {
@@ -92,9 +127,17 @@ function UserView(props) {
   }, [props.match.params.formId]);
 
   function submitResponse() {
+
+    if (email === "" || name === "") {
+      return alert('Enter your email amd name!');
+    }
+
+    const datastor = `ID: ${userId}, email: ${email}, name: ${name}`
+
+
     var submissionData = {
       formId: formData._id,
-      userId: userId,
+      userId: datastor,
       response: responseData
     }
     console.log(submissionData);
@@ -130,7 +173,7 @@ function UserView(props) {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" style={{}}>
-              Velocity Forms
+              mGoogleForms
             </Typography>
           </Toolbar>
         </AppBar>
@@ -158,8 +201,42 @@ function UserView(props) {
                   </div>
                 </div>
               </Grid>
+              <br></br>
+              {!isSubmitted ? (<div>
+                <Grid style={{ borderTop: '10px solid teal', borderRadius: 10 }}>
+                  <div>
+                    <div>
+                      <Paper elevation={2} style={{ width: '100%' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginLeft: '15px', paddingTop: '20px', paddingBottom: '20px' }}>
+                          <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="name"
+                            label="name"
+                            name="name"
+                            autoComplete="name"
+                            onChange={handleChangeInput}
+                            value={userData.name}
+                          />
+                          <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="email"
+                            label="Email Address"
+                            name="email"
+                            autoComplete="email"
+                            onChange={handleChangeInput}
+                            value={userData.email}
+                          />
+                        </div>
+                      </Paper>
+                    </div>
+                  </div>
+                </Grid>
 
-              {!isSubmitted ? (
+
                 <div>
                   <Grid>
 
@@ -186,7 +263,11 @@ function UserView(props) {
 
                               <div>
 
-                                <RadioGroup aria-label="quiz" name="quiz" value={value} onChange={(e) => { handleRadioChange(e.target.value, i) }}>
+
+
+
+
+                                <RadioGroup aria-label="quiz" name="quiz"  onChange={(e) => { handleRadioChange(e.target.value, i) }}>
 
                                   {ques.options.map((op, j) => (
                                     <div key={j}>
@@ -204,6 +285,7 @@ function UserView(props) {
                                       </div>
                                     </div>
                                   ))}
+
                                 </RadioGroup>
 
                               </div>
@@ -226,6 +308,7 @@ function UserView(props) {
 
                   </Grid>
                 </div>
+              </div>
               ) :
                 (
                   <div>

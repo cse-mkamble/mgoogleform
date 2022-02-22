@@ -1,7 +1,7 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 import { Card, CardActionArea, CardActions, CardContent, CardMedia, Button, Typography, Paper, Grid } from '@mui/material';
-import Moment from 'moment';
+import Moment from 'react-moment';
 
 import GoogleForms from "../../Images/GoogleForms.jpg";
 
