@@ -1,7 +1,8 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 import { Card, CardActionArea, CardActions, CardContent, CardMedia, Button, Typography, Paper, Grid } from '@mui/material';
-import Moment from 'react-moment';
+// import Moment from 'react-moment';
+import moment from 'moment';
 
 import GoogleForms from "../../Images/GoogleForms.jpg";
 
@@ -44,7 +45,7 @@ export default function OneForm(props) {
                         {form.description}
                     </Typography>
                     <Typography variant="body2" color="textSecondary" component="p">
-                        Opened:  <Moment fromNow>{form.updatedAt}</Moment>
+                        Opened:  {moment(form.updatedAt).fromNow()}
                     </Typography>
 
                 </CardContent>
